@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Estate News Daily</title>
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f8f9fa;
+            color: #333;
+            padding: 1rem;
+        }
+
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 1rem 2rem;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        header .nav-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .main {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .news-stats {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.875rem;
+        }
+
+        .property-type-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-btn.active {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .news-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .news-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .news-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .news-card img {
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+        }
+
+        .news-card h3 {
+            font-size: 1.1rem;
+            margin: 0.5rem 0;
+        }
+
+        .news-card p {
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .news-card a {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 0.875rem;
+        }
+
+        .news-card a:hover {
+            text-decoration: underline;
+        }
+
+        .error {
+            color: red;
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        .loading {
+            text-align: center;
+            font-size: 1rem;
+            color: gray;
+        }
+
+        @media (max-width: 600px) {
+            header {
+                font-size: 1.2rem;
+            }
+
+            .filter-btn {
+                flex: 1 1 auto;
+            }
+        }
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+
+        footer a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="nav-brand">Real Estate News Daily</div>
+    </header>
+
+    <main class="main">
+        <!-- Market Statistics Section -->
+        <div class="news-stats">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value" id="avgHomePrice">$425,000</div>
+                    <div class="stat-label">Average Home Price</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="mortgageRate">6.5%</div>
+                    <div class="stat-label">Current Mortgage Rate</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="listingsCount">+2.4%</div>
+                    <div class="stat-label">Monthly Listing Change</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="marketIndex">128.5</div>
+                    <div class="stat-label">Real Estate Market Index</div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="news-grid">
+            <!-- News cards will be dynamically inserted here -->
+        </div>
+    </main>
+
+    <script>
+        const API_KEY = "189f68e47f294bbc8f7cc217b68d4e30";
+
+        async function fetchRealEstateNews() {
+            const apiUrl = `https://newsapi.org/v2/everything?q=India+real+estate+property&language=en&sortBy=publishedAt&apiKey=${API_KEY}`;
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+                if (data && data.articles) {
+                    return data.articles;
+                } else {
+                    console.error("No articles found in API response.");
+                    return [];
+                }
+            } catch (error) {
+                console.error("Error fetching news:", error);
+                return [];
+            }
+        }
+
+        function createNewsCard(article) {
+            return `
+                <div class="news-card">
+                    <img src="${article.urlToImage || 'placeholder.jpg'}" alt="${article.title}">
+                    <h3>${article.title}</h3>
+                    <p>${article.description || 'No description available.'}</p>
+                    <a href="${article.url}" target="_blank">Read more</a>
+                </div>
+            `;
+        }
+
+        async function initializeNews() {
+            const newsGrid = document.querySelector('.news-grid');
+            newsGrid.innerHTML = '<div class="loading">Loading real estate news...</div>';
+            try {
+                const articles = await fetchRealEstateNews();
+                newsGrid.innerHTML = '';
+                if (!articles || articles.length === 0) {
+                    newsGrid.innerHTML = '<div class="error">No real estate news found</div>';
+                    return;
+                }
+                articles.forEach(article => {
+                    newsGrid.innerHTML += createNewsCard(article);
+                });
+            } catch (error) {
+                newsGrid.innerHTML = '<div class="error">Failed to load real estate news. Please try again later.</div>';
+                console.error("Error in initializeNews:", error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', initializeNews);
+    </script>
+    <footer>
+        <p>&copy; 2024 Bangalore Homes | Built with ❤️ by Sahil Jadhav, Raunak Agrawal, Sohail Sheikh, Nayan Tiwari</p>
+    </footer>
+</body>
+</html>
+

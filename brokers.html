@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bangalore Brokers</title>
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            padding: 1rem;
+        }
+
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        header h1 {
+            font-size: 2rem;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            text-align: center;
+            margin-bottom: 1rem;
+            color: #007bff;
+        }
+
+        .brokers-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .broker-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .broker-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .broker-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .broker-card p {
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .broker-card a {
+            text-decoration: none;
+            color: #007bff;
+            font-size: 0.9rem;
+        }
+
+        .broker-card a:hover {
+            text-decoration: underline;
+        }
+
+        .error {
+            text-align: center;
+            color: red;
+            font-size: 1rem;
+            margin-top: 1rem;
+        }
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            margin-top: 2rem;
+        }
+
+        footer a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Bangalore Brokers Directory</h1>
+    </header>
+
+    <main>
+        <section>
+            <div class="section-title">Top Brokers in Bangalore</div>
+            <div id="brokersList" class="brokers-list">
+                <!-- Brokers will be dynamically added here -->
+            </div>
+            <div id="errorMessage" class="error"></div>
+        </section>
+    </main>
+
+    <script>
+        // Example Broker Data
+        const brokers = [
+    { name: "Dream Home Realty", phone: "+91 98765 43210", email: "contact@dreamhome.com", website: "http://dreamhome.com" },
+    { name: "Urban Living Realtors", phone: "+91 91234 56789", email: "info@urbanliving.com", website: "http://urbanliving.com" },
+    { name: "Greenfield Properties", phone: "+91 92345 67890", email: "support@greenfield.com", website: "http://greenfield.com" },
+    { name: "Bangalore Realty Experts", phone: "+91 93456 78901", email: "hello@realtyexperts.com", website: "http://realtyexperts.com" },
+    { name: "Safe Haven Realty", phone: "+91 94567 89012", email: "sales@safehaven.com", website: "http://safehaven.com" },
+    { name: "Settlin Property Consultancy", phone: "+91 91084 99774", email: "contact@settlin.com", website: "https://settlin.com" },
+    { name: "Hanu Reddy Realty", phone: "+91 93425 17421", email: "info@hanureddyrealty.com", website: "http://hanureddyrealty.com" },
+    { name: "Square Feet Realtors", phone: "+91 96865 46789", email: "info@squarefeet.com", website: "http://squarefeet.com" },
+    { name: "Bhoomi Homes", phone: "+91 98765 43219", email: "contact@bhoomihomes.com", website: "http://bhoomihomes.com" },
+    { name: "Sri Sai Commercials Real Estate", phone: "+91 91234 56781", email: "srisai@realestate.com", website: "http://srisai.com" },
+    { name: "Thirumala Real Estate", phone: "+91 92345 67891", email: "support@thirumala.com", website: "http://thirumala.com" },
+    { name: "Feroze’s Estate Agency", phone: "+91 93456 78902", email: "hello@ferozestate.com", website: "http://ferozestate.com" },
+    { name: "Druthi Enterprises", phone: "+91 94567 89013", email: "sales@druthi.com", website: "http://druthi.com" },
+    { name: "Raintree Park Consultant", phone: "+91 95678 90124", email: "consult@raintree.com", website: "http://raintree.com" },
+    { name: "Ven and Ventures", phone: "+91 96789 01235", email: "contact@venventures.com", website: "http://venventures.com" },
+    { name: "Property Landmark", phone: "+91 94567 89011", email: "info@propertylandmark.com", website: "http://propertylandmark.com" },
+    { name: "Yashas Real Estate", phone: "+91 97845 67982", email: "yashas@yashasrealty.com", website: "http://yashasrealty.com" },
+    { name: "FA Real Estate Agents", phone: "+91 89765 43219", email: "info@farealty.com", website: "http://farealty.com" },
+    { name: "Pinnacle Properties", phone: "+91 93456 78900", email: "support@pinnacleprops.com", website: "http://pinnacleprops.com" },
+    { name: "Whitefield Realty", phone: "+91 94678 90123", email: "sales@whitefieldrealty.com", website: "http://whitefieldrealty.com" },
+    { name: "Koramangala Estates", phone: "+91 91234 56782", email: "info@koramangalaestates.com", website: "http://koramangalaestates.com" },
+    { name: "HSR Realtors", phone: "+91 96543 21987", email: "contact@hsrrealtors.com", website: "http://hsrrealtors.com" },
+    { name: "Prestige Property Experts", phone: "+91 93214 67891", email: "info@prestigeexperts.com", website: "http://prestigeexperts.com" },
+    { name: "Brigade Realty", phone: "+91 94567 89001", email: "support@brigaderealty.com", website: "http://brigaderealty.com" },
+    { name: "JP Nagar Realtors", phone: "+91 94567 89022", email: "sales@jpnagar.com", website: "http://jpnagar.com" },
+    { name: "Indiranagar Realty", phone: "+91 92345 67881", email: "contact@indiranagarrealty.com", website: "http://indiranagarrealty.com" },
+    { name: "Benson Town Properties", phone: "+91 96789 01234", email: "info@bensontown.com", website: "http://bensontown.com" },
+    { name: "Sarjapur Estates", phone: "+91 98765 43100", email: "support@sarjapurestates.com", website: "http://sarjapurestates.com" },
+    { name: "Bangalore Realty Co.", phone: "+91 91084 99887", email: "contact@bangalorerealty.com", website: "http://bangalorerealty.com" },
+    { name: "Bannerghatta Realtors", phone: "+91 94567 89999", email: "info@bannerghattarealtors.com", website: "http://bannerghattarealtors.com" }
+];
+
+
+        // Populate Brokers List
+        const brokersList = document.getElementById('brokersList');
+        const errorMessage = document.getElementById('errorMessage');
+
+        function loadBrokers() {
+            try {
+                brokers.forEach((broker) => {
+                    const card = document.createElement('div');
+                    card.classList.add('broker-card');
+
+                    card.innerHTML = `
+                        <h3>${broker.name}</h3>
+                        <p><strong>Phone:</strong> ${broker.phone}</p>
+                        <p><strong>Email:</strong> <a href="mailto:${broker.email}">${broker.email}</a></p>
+                        <p><strong>Website:</strong> <a href="${broker.website}" target="_blank">${broker.website}</a></p>
+                    `;
+
+                    brokersList.appendChild(card);
+                });
+            } catch (error) {
+                errorMessage.textContent = "Failed to load brokers. Please try again later.";
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadBrokers);
+    </script>
+     <footer>
+        <p>&copy; 2024 Bangalore Homes | Built with ❤️ by Sahil Jadhav, Raunak Agrawal, Sohail Sheikh, Nayan Tiwari</p>
+    </footer>
+</body>
+</html>
